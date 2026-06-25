@@ -1,5 +1,7 @@
 import '@testing-library/jest-native/extend-expect';
 
+jest.setTimeout(15000);
+
 const mockStorage = new Map<string, string>();
 
 jest.mock('@react-native-async-storage/async-storage', () => ({

@@ -47,12 +47,20 @@ export function GlassBottomSheet({ visible, onDismiss, children, contentStyle }:
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFill,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     justifyContent: 'flex-end',
     zIndex: 20,
   },
   backdrop: {
-    ...StyleSheet.absoluteFill,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: colors.backdrop,
   },
   sheetContainer: {
