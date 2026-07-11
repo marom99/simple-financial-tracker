@@ -26,10 +26,13 @@ describe('HomeScreen', () => {
     mockLoad.mockResolvedValue([]);
   });
 
-  it('renders zero totals without comparison copy when empty', async () => {
-    const { findByText, queryByText } = renderHome();
-    expect(await findByText('Today')).toBeTruthy();
-    expect(queryByText(/vs last period/i)).toBeNull();
+  it('renders the Figma home chrome with zero totals', async () => {
+    const { findByText } = renderHome();
+    expect(await findByText(/Hi, Frederic/)).toBeTruthy();
+    expect(await findByText('Today spent')).toBeTruthy();
+    expect(await findByText('Weekly spent')).toBeTruthy();
+    expect(await findByText('Scan')).toBeTruthy();
+    expect(await findByText('No expenses today')).toBeTruthy();
   });
 
   it('opens add expense flow from the floating button', async () => {
@@ -39,13 +42,13 @@ describe('HomeScreen', () => {
     expect(titles.length).toBeGreaterThan(0);
   });
 
-  it('opens breakdown sheet when a period row is pressed', async () => {
+  it('opens breakdown sheet when a spending card is pressed', async () => {
     const { findByLabelText, findByText } = renderHome();
     fireEvent.press(await findByLabelText(/Today,/));
     expect(await findByText('No expenses yet')).toBeTruthy();
   });
 
-  it('shows formatted totals for seeded expenses', async () => {
+  it('shows formatted totals and today transactions for seeded expenses', async () => {
     mockLoad.mockResolvedValue([
       {
         id: '1',
@@ -58,8 +61,10 @@ describe('HomeScreen', () => {
       },
     ]);
 
-    const { findAllByText } = renderHome();
+    const { findAllByText, findByText } = renderHome();
     const totals = await findAllByText('Rp50.000', {}, { timeout: 3000 });
     expect(totals.length).toBeGreaterThan(0);
+    expect(await findByText('KFC')).toBeTruthy();
+    expect(await findByText('-Rp50.000')).toBeTruthy();
   });
 });

@@ -16,8 +16,10 @@ describe('app foundation', () => {
         <App />
       </SafeAreaProvider>,
     );
-    expect(getByText(/Good (morning|afternoon|evening)/)).toBeTruthy();
-    expect(getByText('Your spending overview')).toBeTruthy();
+    expect(getByText(/Hi, Frederic/)).toBeTruthy();
+    expect(getByText('Today spent')).toBeTruthy();
+    expect(getByText('Weekly spent')).toBeTruthy();
+    expect(getByText('Scan')).toBeTruthy();
   });
 
   it('imports theme tokens without circular dependency issues', () => {

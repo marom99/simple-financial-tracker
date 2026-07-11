@@ -30,3 +30,25 @@ export function parseLocalDate(dateString: string): Date {
   const [year, month, day] = dateString.split('-').map(Number);
   return new Date(year, month - 1, day);
 }
+
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+/** Figma-style section header, e.g. "Today 11 July". */
+export function formatTodaySectionLabel(referenceDate: Date = new Date()): string {
+  const day = referenceDate.getDate();
+  const month = MONTH_NAMES[referenceDate.getMonth()];
+  return `Today ${day} ${month}`;
+}

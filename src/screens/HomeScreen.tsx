@@ -1,31 +1,36 @@
 import React, { useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FloatingAddButton } from '../components/FloatingAddButton';
-import { PeriodSummaryRow } from '../components/PeriodSummaryRow';
+import { HomeTransactionRow } from '../components/HomeTransactionRow';
+import { SpendingCard } from '../components/SpendingCard';
 import { AddExpenseSheet } from '../features/expenses/AddExpenseSheet';
 import { ExpenseBreakdownSheet } from '../features/expenses/ExpenseBreakdownSheet';
 import { useExpenses } from '../features/expenses/ExpenseStoreContext';
-import { buildAllPeriodSummaries } from '../features/expenses/selectors';
+import { buildPeriodSummary } from '../features/expenses/selectors';
 import type { PeriodSummary, PeriodType } from '../features/expenses/types';
-import { colors, spacing, typography } from '../theme';
-import { getGreeting } from '../utils/dateLabels';
+import { colors, homeLayout, spacing, spendingLimits, typography } from '../theme';
+import { formatTodaySectionLabel } from '../utils/dateLabels';
 
-const PERIOD_LABELS: Record<PeriodType, string> = {
-  today: 'Today',
-  week: 'Week',
-  month: 'Month',
-};
+const DISPLAY_NAME = 'Frederic';
+const HEADER_GRADIENT = require('../../assets/home/header-gradient.png');
 
 export function HomeScreen() {
   const expenses = useExpenses();
-  const summaries = useMemo(() => buildAllPeriodSummaries(expenses), [expenses]);
+  const insets = useSafeAreaInsets();
+  const todaySummary = useMemo(() => buildPeriodSummary(expenses, 'today'), [expenses]);
+  const weekSummary = useMemo(() => buildPeriodSummary(expenses, 'week'), [expenses]);
   const [selectedSummary, setSelectedSummary] = useState<PeriodSummary | null>(null);
   const [addVisible, setAddVisible] = useState(false);
 
   const openBreakdown = (period: PeriodType) => {
-    const summary = summaries.find((item) => item.period === period) ?? null;
-    setSelectedSummary(summary);
+    setSelectedSummary(period === 'today' ? todaySummary : weekSummary);
   };
 
   const closeBreakdown = () => setSelectedSummary(null);
@@ -36,36 +41,61 @@ export function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.greeting}>{getGreeting()}</Text>
-          <Text style={styles.subtitle}>Your spending overview</Text>
-        </View>
+    <View style={styles.root}>
+      <Image source={HEADER_GRADIENT} style={styles.gradient} resizeMode="cover" />
 
-        <View style={styles.summarySection}>
-          {summaries.map((summary, index) => (
-            <PeriodSummaryRow
-              key={summary.period}
-              amount={summary.total}
-              comparisonLabel={summary.comparisonLabel}
-              label={PERIOD_LABELS[summary.period]}
-              onPress={() => openBreakdown(summary.period)}
-              showDivider={index < summaries.length - 1}
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: insets.bottom + 96 },
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.greeting}>{`Hi, ${DISPLAY_NAME} ☺️`}</Text>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.cardsRow}
+            decelerationRate="fast"
+            snapToInterval={homeLayout.cardWidth + homeLayout.cardGap}
+            snapToAlignment="start"
+          >
+            <SpendingCard
+              accessibilityLabel={`Today, ${todaySummary.total}`}
+              amount={todaySummary.total}
+              limit={spendingLimits.today}
+              onPress={() => openBreakdown('today')}
+              title="Today spent"
             />
-          ))}
-        </View>
+            <SpendingCard
+              accessibilityLabel={`Week, ${weekSummary.total}`}
+              amount={weekSummary.total}
+              limit={spendingLimits.week}
+              onPress={() => openBreakdown('week')}
+              title="Weekly spent"
+            />
+          </ScrollView>
 
-        <View style={styles.tabBar}>
-          <Text style={[styles.tabLabel, styles.tabActive]}>Home</Text>
-          <Text style={styles.tabLabel}>Insights</Text>
-          <Text style={styles.tabLabel}>Settings</Text>
-        </View>
+          <View style={styles.listSection}>
+            <Text style={styles.dateLabel}>{formatTodaySectionLabel()}</Text>
+            <View style={styles.list}>
+              {todaySummary.expenses.length === 0 ? (
+                <Text style={styles.emptyList}>No expenses today</Text>
+              ) : (
+                todaySummary.expenses.map((expense) => (
+                  <HomeTransactionRow key={expense.id} expense={expense} />
+                ))
+              )}
+            </View>
+          </View>
+        </ScrollView>
 
-        <View style={styles.addButtonContainer}>
+        <View style={[styles.fabContainer, { bottom: Math.max(insets.bottom, 12) + 18 }]}>
           <FloatingAddButton onPress={() => setAddVisible(true)} />
         </View>
-      </View>
+      </SafeAreaView>
 
       <ExpenseBreakdownSheet
         onAddExpense={openAddFromBreakdown}
@@ -75,54 +105,60 @@ export function HomeScreen() {
       />
 
       <AddExpenseSheet onClose={() => setAddVisible(false)} visible={addVisible} />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  root: {
     flex: 1,
     backgroundColor: colors.background,
   },
-  container: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
+  gradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    width: '100%',
+    height: 256,
   },
-  header: {
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
-    gap: spacing.xs,
+  safeArea: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   greeting: {
-    ...typography.greeting,
-    color: colors.text,
+    ...typography.title3,
+    color: colors.textPrimary,
+    marginLeft: homeLayout.horizontalPadding + 1,
+    marginTop: homeLayout.greetingTop,
+    marginBottom: spacing.md,
   },
-  subtitle: {
-    ...typography.comparison,
-    color: colors.textSecondary,
+  cardsRow: {
+    paddingLeft: homeLayout.horizontalPadding,
+    paddingRight: homeLayout.horizontalPadding,
+    gap: homeLayout.cardGap,
   },
-  summarySection: {
-    flex: 1,
+  listSection: {
+    marginTop: homeLayout.listTop,
+    paddingHorizontal: homeLayout.horizontalPadding,
+    gap: 12,
   },
-  tabBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: spacing.md,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.divider,
-    marginBottom: spacing.xxl,
+  dateLabel: {
+    ...typography.small,
+    color: colors.textMuted,
   },
-  tabLabel: {
-    ...typography.caption,
-    color: colors.tabInactive,
+  list: {
+    gap: spacing.sm,
   },
-  tabActive: {
-    color: colors.text,
-    fontWeight: '600',
+  emptyList: {
+    ...typography.normal,
+    color: colors.textHint,
+    paddingVertical: spacing.sm,
   },
-  addButtonContainer: {
+  fabContainer: {
     position: 'absolute',
-    bottom: spacing.xxl + spacing.lg,
-    alignSelf: 'center',
+    right: 16,
   },
 });
