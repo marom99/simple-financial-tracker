@@ -17,9 +17,9 @@ describe('app foundation', () => {
       </SafeAreaProvider>,
     );
     expect(getByText(/Hi, Frederic/)).toBeTruthy();
-    expect(getByText('Today spent')).toBeTruthy();
-    expect(getByText('Weekly spent')).toBeTruthy();
-    expect(getByText('Monthly spent')).toBeTruthy();
+    expect(getByText('Today')).toBeTruthy();
+    expect(getByText('This week')).toBeTruthy();
+    expect(getByText('This month')).toBeTruthy();
   });
 
   it('imports theme tokens without circular dependency issues', () => {

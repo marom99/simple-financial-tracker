@@ -24,9 +24,18 @@ export type ExpenseValidationError =
   | 'missing_category'
   | 'invalid_date';
 
+export type ComparisonDirection = 'up' | 'down' | 'flat';
+
+export interface ComparisonIndicatorData {
+  direction: ComparisonDirection;
+  percent: number | null;
+}
+
 export interface PeriodSummary {
   period: PeriodType;
   total: number;
-  comparisonLabel: string | null;
+  previousTotal: number;
+  comparison: ComparisonIndicatorData;
+  previousPeriodLine: string;
   expenses: Expense[];
 }

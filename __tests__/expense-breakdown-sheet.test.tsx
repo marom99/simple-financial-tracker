@@ -7,7 +7,9 @@ import { renderWithProviders } from './test-utils';
 const todaySummary: PeriodSummary = {
   period: 'today',
   total: 50000,
-  comparisonLabel: 'New spending',
+  previousTotal: 0,
+  comparison: { direction: 'up', percent: null },
+  previousPeriodLine: 'Yesterday: Rp0',
   expenses: [
     {
       id: '1',
@@ -24,7 +26,9 @@ const todaySummary: PeriodSummary = {
 const emptyWeekSummary: PeriodSummary = {
   period: 'week',
   total: 0,
-  comparisonLabel: null,
+  previousTotal: 0,
+  comparison: { direction: 'flat', percent: 0 },
+  previousPeriodLine: 'Last week: Rp0',
   expenses: [],
 };
 

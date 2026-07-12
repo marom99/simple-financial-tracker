@@ -26,12 +26,16 @@ describe('HomeScreen', () => {
     mockLoad.mockResolvedValue([]);
   });
 
-  it('renders the Figma home chrome with zero totals', async () => {
-    const { findByText } = renderHome();
+  it('renders the home chrome with concise period cards', async () => {
+    const { findByText, findAllByText } = renderHome();
     expect(await findByText(/Hi, Frederic/)).toBeTruthy();
-    expect(await findByText('Today spent')).toBeTruthy();
-    expect(await findByText('Weekly spent')).toBeTruthy();
-    expect(await findByText('Monthly spent')).toBeTruthy();
+    expect(await findByText('Today')).toBeTruthy();
+    expect(await findByText('This week')).toBeTruthy();
+    expect(await findByText('This month')).toBeTruthy();
+    expect((await findAllByText('0%')).length).toBe(3);
+    expect(await findByText('Yesterday: Rp0')).toBeTruthy();
+    expect(await findByText('Last week: Rp0')).toBeTruthy();
+    expect(await findByText('Last month: Rp0')).toBeTruthy();
   });
 
   it('opens add expense flow from the floating button', async () => {
@@ -43,11 +47,13 @@ describe('HomeScreen', () => {
 
   it('opens breakdown sheet when a spending card is pressed', async () => {
     const { findByLabelText, findByText } = renderHome();
-    fireEvent.press(await findByLabelText(/Today,/));
+    fireEvent.press(
+      await findByLabelText('Today, Rp0 spent, same as yesterday, yesterday Rp0'),
+    );
     expect(await findByText('No expenses yet')).toBeTruthy();
   });
 
-  it('shows formatted totals on cards and expenses in breakdown for seeded data', async () => {
+  it('shows formatted totals, comparisons, and expenses in breakdown for seeded data', async () => {
     mockLoad.mockResolvedValue([
       {
         id: '1',
@@ -63,7 +69,8 @@ describe('HomeScreen', () => {
     const { findAllByText, findByLabelText, findByText } = renderHome();
     const totals = await findAllByText('Rp50.000', {}, { timeout: 3000 });
     expect(totals.length).toBeGreaterThan(0);
-    fireEvent.press(await findByLabelText(/Today,/));
+    expect(await findByText('Yesterday: Rp0')).toBeTruthy();
+    fireEvent.press(await findByLabelText(/Today, Rp50.000 spent, higher than yesterday/));
     expect(await findByText('KFC')).toBeTruthy();
     expect(await findByText('-Rp50.000')).toBeTruthy();
   });

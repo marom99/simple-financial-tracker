@@ -1,4 +1,7 @@
-import { formatComparisonPercent } from '../../utils/currency';
+import {
+  buildComparisonIndicator,
+  formatPreviousPeriodLine,
+} from './comparison';
 import type { Expense, PeriodSummary, PeriodType } from './types';
 import { getPeriodRange, getPreviousPeriodRange, isDateInRange } from './periods';
 
@@ -25,7 +28,9 @@ export function buildPeriodSummary(
   return {
     period,
     total,
-    comparisonLabel: formatComparisonPercent(total, previousTotal),
+    previousTotal,
+    comparison: buildComparisonIndicator(total, previousTotal),
+    previousPeriodLine: formatPreviousPeriodLine(period, previousTotal),
     expenses: periodExpenses.sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt)),
   };
 }

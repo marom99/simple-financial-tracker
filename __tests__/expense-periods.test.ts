@@ -35,6 +35,8 @@ describe('period calculations', () => {
     const expenses = [expense('2026-05-30', 10000)];
     const monthSummary = buildPeriodSummary(expenses, 'month', referenceDate);
     expect(monthSummary.total).toBe(0);
+    expect(monthSummary.previousTotal).toBe(10000);
+    expect(monthSummary.previousPeriodLine).toBe('Last month: Rp10.000');
 
     const previousRange = getPreviousPeriodRange('month', referenceDate);
     expect(isDateInRange('2026-05-30', previousRange)).toBe(true);
@@ -50,13 +52,32 @@ describe('period calculations', () => {
   it('returns zero totals and empty lists for empty periods', () => {
     const summary = buildPeriodSummary([], 'today', referenceDate);
     expect(summary.total).toBe(0);
+    expect(summary.previousTotal).toBe(0);
     expect(summary.expenses).toEqual([]);
-    expect(summary.comparisonLabel).toBeNull();
+    expect(summary.comparison).toEqual({ direction: 'flat', percent: 0 });
+    expect(summary.previousPeriodLine).toBe('Yesterday: Rp0');
   });
 
   it('avoids misleading percentage output when previous total is zero', () => {
     const summary = buildPeriodSummary([expense('2026-06-24', 50000)], 'today', referenceDate);
-    expect(summary.comparisonLabel).toBe('New spending');
-    expect(summary.comparisonLabel).not.toMatch(/Infinity/i);
+    expect(summary.comparison).toEqual({ direction: 'up', percent: null });
+    expect(summary.previousPeriodLine).toBe('Yesterday: Rp0');
+  });
+
+  it('computes higher and lower comparisons from previous period totals', () => {
+    const higherSummary = buildPeriodSummary(
+      [expense('2026-06-24', 60000), expense('2026-06-23', 50000)],
+      'today',
+      referenceDate,
+    );
+    expect(higherSummary.comparison).toEqual({ direction: 'up', percent: 20 });
+    expect(higherSummary.previousTotal).toBe(50000);
+
+    const lowerSummary = buildPeriodSummary(
+      [expense('2026-06-24', 25000), expense('2026-06-23', 50000)],
+      'today',
+      referenceDate,
+    );
+    expect(lowerSummary.comparison).toEqual({ direction: 'down', percent: 50 });
   });
 });

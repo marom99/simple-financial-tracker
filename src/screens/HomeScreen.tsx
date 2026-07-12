@@ -13,6 +13,7 @@ import { AddExpenseSheet } from '../features/expenses/AddExpenseSheet';
 import { ExpenseBreakdownSheet } from '../features/expenses/ExpenseBreakdownSheet';
 import { useExpenses } from '../features/expenses/ExpenseStoreContext';
 import { buildPeriodSummary } from '../features/expenses/selectors';
+import { formatSpendingCardAccessibilityLabel } from '../features/expenses/comparison';
 import type { PeriodSummary, PeriodType } from '../features/expenses/types';
 import { colors, homeLayout, spacing, typography } from '../theme';
 
@@ -60,22 +61,43 @@ export function HomeScreen() {
 
           <View style={styles.cardsStack}>
             <SpendingCard
-              accessibilityLabel={`Today, ${todaySummary.total}`}
+              accessibilityLabel={formatSpendingCardAccessibilityLabel(
+                'Today',
+                todaySummary.total,
+                'today',
+                todaySummary.previousTotal,
+              )}
               amount={todaySummary.total}
+              comparison={todaySummary.comparison}
               onPress={() => openBreakdown('today')}
-              title="Today spent"
+              previousPeriodLine={todaySummary.previousPeriodLine}
+              title="Today"
             />
             <SpendingCard
-              accessibilityLabel={`Week, ${weekSummary.total}`}
+              accessibilityLabel={formatSpendingCardAccessibilityLabel(
+                'This week',
+                weekSummary.total,
+                'week',
+                weekSummary.previousTotal,
+              )}
               amount={weekSummary.total}
+              comparison={weekSummary.comparison}
               onPress={() => openBreakdown('week')}
-              title="Weekly spent"
+              previousPeriodLine={weekSummary.previousPeriodLine}
+              title="This week"
             />
             <SpendingCard
-              accessibilityLabel={`Month, ${monthSummary.total}`}
+              accessibilityLabel={formatSpendingCardAccessibilityLabel(
+                'This month',
+                monthSummary.total,
+                'month',
+                monthSummary.previousTotal,
+              )}
               amount={monthSummary.total}
+              comparison={monthSummary.comparison}
               onPress={() => openBreakdown('month')}
-              title="Monthly spent"
+              previousPeriodLine={monthSummary.previousPeriodLine}
+              title="This month"
             />
           </View>
         </ScrollView>
