@@ -1,7 +1,7 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { colors, hitSlop, homeLayout, typography } from '../theme';
+import { colors, hitSlop, homeLayout } from '../theme';
 
 interface FloatingAddButtonProps {
   onPress: () => void;
@@ -32,14 +32,12 @@ export function FloatingAddButton({ onPress }: FloatingAddButtonProps) {
       <View style={styles.button}>
         <PlusIcon />
       </View>
-      <Text style={styles.label}>Scan</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   wrap: {
-    width: 75,
     alignItems: 'center',
   },
   pressed: {
@@ -58,11 +56,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 8,
     elevation: 8,
-  },
-  label: {
-    ...typography.scanLabel,
-    color: colors.interactive,
-    textAlign: 'center',
-    marginTop: 4,
   },
 });

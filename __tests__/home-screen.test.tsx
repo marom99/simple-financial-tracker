@@ -31,8 +31,7 @@ describe('HomeScreen', () => {
     expect(await findByText(/Hi, Frederic/)).toBeTruthy();
     expect(await findByText('Today spent')).toBeTruthy();
     expect(await findByText('Weekly spent')).toBeTruthy();
-    expect(await findByText('Scan')).toBeTruthy();
-    expect(await findByText('No expenses today')).toBeTruthy();
+    expect(await findByText('Monthly spent')).toBeTruthy();
   });
 
   it('opens add expense flow from the floating button', async () => {
@@ -48,7 +47,7 @@ describe('HomeScreen', () => {
     expect(await findByText('No expenses yet')).toBeTruthy();
   });
 
-  it('shows formatted totals and today transactions for seeded expenses', async () => {
+  it('shows formatted totals on cards and expenses in breakdown for seeded data', async () => {
     mockLoad.mockResolvedValue([
       {
         id: '1',
@@ -61,9 +60,10 @@ describe('HomeScreen', () => {
       },
     ]);
 
-    const { findAllByText, findByText } = renderHome();
+    const { findAllByText, findByLabelText, findByText } = renderHome();
     const totals = await findAllByText('Rp50.000', {}, { timeout: 3000 });
     expect(totals.length).toBeGreaterThan(0);
+    fireEvent.press(await findByLabelText(/Today,/));
     expect(await findByText('KFC')).toBeTruthy();
     expect(await findByText('-Rp50.000')).toBeTruthy();
   });

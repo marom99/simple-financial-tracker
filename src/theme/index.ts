@@ -46,10 +46,12 @@ export const typography = {
   periodLabel: {
     fontSize: 17,
     fontWeight: '400' as const,
+    lineHeight: 22,
   },
   periodAmount: {
     fontSize: 20,
     fontWeight: '600' as const,
+    lineHeight: 24,
   },
   comparison: {
     fontSize: 14,
@@ -88,10 +90,6 @@ export const typography = {
     fontSize: 11,
     fontWeight: '400' as const,
     lineHeight: 12,
-  },
-  cardTitle: {
-    fontSize: 12,
-    fontWeight: '500' as const,
   },
   scanLabel: {
     fontSize: 12,
@@ -133,4 +131,5 @@ export const homeLayout = {
 export const spendingLimits = {
   today: 55000,
   week: 55000,
+  month: 220000,
 };

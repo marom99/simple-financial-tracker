@@ -19,7 +19,7 @@ describe('app foundation', () => {
     expect(getByText(/Hi, Frederic/)).toBeTruthy();
     expect(getByText('Today spent')).toBeTruthy();
     expect(getByText('Weekly spent')).toBeTruthy();
-    expect(getByText('Scan')).toBeTruthy();
+    expect(getByText('Monthly spent')).toBeTruthy();
   });
 
   it('imports theme tokens without circular dependency issues', () => {

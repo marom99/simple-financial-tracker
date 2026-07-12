@@ -8,15 +8,13 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FloatingAddButton } from '../components/FloatingAddButton';
-import { HomeTransactionRow } from '../components/HomeTransactionRow';
 import { SpendingCard } from '../components/SpendingCard';
 import { AddExpenseSheet } from '../features/expenses/AddExpenseSheet';
 import { ExpenseBreakdownSheet } from '../features/expenses/ExpenseBreakdownSheet';
 import { useExpenses } from '../features/expenses/ExpenseStoreContext';
 import { buildPeriodSummary } from '../features/expenses/selectors';
 import type { PeriodSummary, PeriodType } from '../features/expenses/types';
-import { colors, homeLayout, spacing, spendingLimits, typography } from '../theme';
-import { formatTodaySectionLabel } from '../utils/dateLabels';
+import { colors, homeLayout, spacing, typography } from '../theme';
 
 const DISPLAY_NAME = 'Frederic';
 const HEADER_GRADIENT = require('../../assets/home/header-gradient.png');
@@ -26,11 +24,17 @@ export function HomeScreen() {
   const insets = useSafeAreaInsets();
   const todaySummary = useMemo(() => buildPeriodSummary(expenses, 'today'), [expenses]);
   const weekSummary = useMemo(() => buildPeriodSummary(expenses, 'week'), [expenses]);
+  const monthSummary = useMemo(() => buildPeriodSummary(expenses, 'month'), [expenses]);
   const [selectedSummary, setSelectedSummary] = useState<PeriodSummary | null>(null);
   const [addVisible, setAddVisible] = useState(false);
 
   const openBreakdown = (period: PeriodType) => {
-    setSelectedSummary(period === 'today' ? todaySummary : weekSummary);
+    const summaries: Record<PeriodType, PeriodSummary> = {
+      today: todaySummary,
+      week: weekSummary,
+      month: monthSummary,
+    };
+    setSelectedSummary(summaries[period]);
   };
 
   const closeBreakdown = () => setSelectedSummary(null);
@@ -54,41 +58,25 @@ export function HomeScreen() {
         >
           <Text style={styles.greeting}>{`Hi, ${DISPLAY_NAME} ☺️`}</Text>
 
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.cardsRow}
-            decelerationRate="fast"
-            snapToInterval={homeLayout.cardWidth + homeLayout.cardGap}
-            snapToAlignment="start"
-          >
+          <View style={styles.cardsStack}>
             <SpendingCard
               accessibilityLabel={`Today, ${todaySummary.total}`}
               amount={todaySummary.total}
-              limit={spendingLimits.today}
               onPress={() => openBreakdown('today')}
               title="Today spent"
             />
             <SpendingCard
               accessibilityLabel={`Week, ${weekSummary.total}`}
               amount={weekSummary.total}
-              limit={spendingLimits.week}
               onPress={() => openBreakdown('week')}
               title="Weekly spent"
             />
-          </ScrollView>
-
-          <View style={styles.listSection}>
-            <Text style={styles.dateLabel}>{formatTodaySectionLabel()}</Text>
-            <View style={styles.list}>
-              {todaySummary.expenses.length === 0 ? (
-                <Text style={styles.emptyList}>No expenses today</Text>
-              ) : (
-                todaySummary.expenses.map((expense) => (
-                  <HomeTransactionRow key={expense.id} expense={expense} />
-                ))
-              )}
-            </View>
+            <SpendingCard
+              accessibilityLabel={`Month, ${monthSummary.total}`}
+              amount={monthSummary.total}
+              onPress={() => openBreakdown('month')}
+              title="Monthly spent"
+            />
           </View>
         </ScrollView>
 
@@ -129,33 +117,15 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   greeting: {
-    ...typography.title3,
+    ...typography.greeting,
     color: colors.textPrimary,
     marginLeft: homeLayout.horizontalPadding + 1,
     marginTop: homeLayout.greetingTop,
     marginBottom: spacing.md,
   },
-  cardsRow: {
-    paddingLeft: homeLayout.horizontalPadding,
-    paddingRight: homeLayout.horizontalPadding,
-    gap: homeLayout.cardGap,
-  },
-  listSection: {
-    marginTop: homeLayout.listTop,
+  cardsStack: {
     paddingHorizontal: homeLayout.horizontalPadding,
-    gap: 12,
-  },
-  dateLabel: {
-    ...typography.small,
-    color: colors.textMuted,
-  },
-  list: {
-    gap: spacing.sm,
-  },
-  emptyList: {
-    ...typography.normal,
-    color: colors.textHint,
-    paddingVertical: spacing.sm,
+    gap: homeLayout.cardGap,
   },
   fabContainer: {
     position: 'absolute',
