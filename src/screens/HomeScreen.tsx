@@ -8,12 +8,11 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FloatingAddButton } from '../components/FloatingAddButton';
-import { SpendingCard } from '../components/SpendingCard';
+import { PeriodOverviewCard } from '../components/PeriodOverviewCard';
 import { AddExpenseSheet } from '../features/expenses/AddExpenseSheet';
 import { ExpenseBreakdownSheet } from '../features/expenses/ExpenseBreakdownSheet';
 import { useExpenses } from '../features/expenses/ExpenseStoreContext';
 import { buildPeriodSummary } from '../features/expenses/selectors';
-import { formatSpendingCardAccessibilityLabel } from '../features/expenses/comparison';
 import type { PeriodSummary, PeriodType } from '../features/expenses/types';
 import { colors, homeLayout, spacing, typography } from '../theme';
 
@@ -57,48 +56,17 @@ export function HomeScreen() {
           ]}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.greeting}>{`Hi, ${DISPLAY_NAME} ☺️`}</Text>
+          <View style={styles.contentFrame}>
+            <Text style={styles.greeting}>{`Hi, ${DISPLAY_NAME} ☺️`}</Text>
 
-          <View style={styles.cardsStack}>
-            <SpendingCard
-              accessibilityLabel={formatSpendingCardAccessibilityLabel(
-                'Today',
-                todaySummary.total,
-                'today',
-                todaySummary.previousTotal,
-              )}
-              amount={todaySummary.total}
-              comparison={todaySummary.comparison}
-              onPress={() => openBreakdown('today')}
-              previousPeriodLine={todaySummary.previousPeriodLine}
-              title="Today"
-            />
-            <SpendingCard
-              accessibilityLabel={formatSpendingCardAccessibilityLabel(
-                'This week',
-                weekSummary.total,
-                'week',
-                weekSummary.previousTotal,
-              )}
-              amount={weekSummary.total}
-              comparison={weekSummary.comparison}
-              onPress={() => openBreakdown('week')}
-              previousPeriodLine={weekSummary.previousPeriodLine}
-              title="This week"
-            />
-            <SpendingCard
-              accessibilityLabel={formatSpendingCardAccessibilityLabel(
-                'This month',
-                monthSummary.total,
-                'month',
-                monthSummary.previousTotal,
-              )}
-              amount={monthSummary.total}
-              comparison={monthSummary.comparison}
-              onPress={() => openBreakdown('month')}
-              previousPeriodLine={monthSummary.previousPeriodLine}
-              title="This month"
-            />
+            <View style={styles.cardsStack}>
+              <PeriodOverviewCard
+                month={monthSummary}
+                onPressPeriod={openBreakdown}
+                today={todaySummary}
+                week={weekSummary}
+              />
+            </View>
           </View>
         </ScrollView>
 
@@ -137,16 +105,20 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    alignItems: 'center',
+  },
+  contentFrame: {
+    width: '100%',
+    maxWidth: homeLayout.contentMaxWidth,
+    paddingHorizontal: homeLayout.horizontalPadding,
+    paddingTop: homeLayout.greetingTop,
   },
   greeting: {
     ...typography.greeting,
     color: colors.textPrimary,
-    marginLeft: homeLayout.horizontalPadding + 1,
-    marginTop: homeLayout.greetingTop,
     marginBottom: spacing.md,
   },
   cardsStack: {
-    paddingHorizontal: homeLayout.horizontalPadding,
     gap: homeLayout.cardGap,
   },
   fabContainer: {

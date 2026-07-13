@@ -12,7 +12,32 @@ interface ComparisonColors {
   circle: string;
 }
 
-function getComparisonColors(direction: ComparisonDirection): ComparisonColors {
+type ComparisonAppearance = 'default' | 'onDark';
+
+function getComparisonColors(
+  direction: ComparisonDirection,
+  appearance: ComparisonAppearance,
+): ComparisonColors {
+  if (appearance === 'onDark') {
+    switch (direction) {
+      case 'up':
+        return {
+          icon: colors.comparisonOnDarkUp,
+          circle: colors.comparisonOnDarkUpCircle,
+        };
+      case 'down':
+        return {
+          icon: colors.comparisonOnDarkDown,
+          circle: colors.comparisonOnDarkDownCircle,
+        };
+      case 'flat':
+        return {
+          icon: colors.comparisonOnDarkFlat,
+          circle: colors.comparisonOnDarkFlatCircle,
+        };
+    }
+  }
+
   switch (direction) {
     case 'up':
       return { icon: colors.danger, circle: 'rgba(198, 40, 40, 0.14)' };
@@ -25,6 +50,7 @@ function getComparisonColors(direction: ComparisonDirection): ComparisonColors {
 
 interface ComparisonIndicatorProps {
   comparison: ComparisonIndicatorData;
+  appearance?: ComparisonAppearance;
 }
 
 function TrendingUpIcon({ color }: { color: string }) {
@@ -100,8 +126,11 @@ function ComparisonIcon({
   }
 }
 
-export function ComparisonIndicator({ comparison }: ComparisonIndicatorProps) {
-  const statusColors = getComparisonColors(comparison.direction);
+export function ComparisonIndicator({
+  comparison,
+  appearance = 'default',
+}: ComparisonIndicatorProps) {
+  const statusColors = getComparisonColors(comparison.direction, appearance);
 
   return (
     <View accessible={false} style={styles.row}>
@@ -122,6 +151,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
+    flexShrink: 0,
   },
   iconCircle: {
     width: ICON_CIRCLE_SIZE,

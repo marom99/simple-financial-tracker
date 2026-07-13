@@ -32,10 +32,8 @@ describe('HomeScreen', () => {
     expect(await findByText('Today')).toBeTruthy();
     expect(await findByText('This week')).toBeTruthy();
     expect(await findByText('This month')).toBeTruthy();
-    expect((await findAllByText('0%')).length).toBe(3);
+    expect((await findAllByText('0%')).length).toBe(1);
     expect(await findByText('Yesterday: Rp0')).toBeTruthy();
-    expect(await findByText('Last week: Rp0')).toBeTruthy();
-    expect(await findByText('Last month: Rp0')).toBeTruthy();
   });
 
   it('opens add expense flow from the floating button', async () => {
@@ -49,6 +47,22 @@ describe('HomeScreen', () => {
     const { findByLabelText, findByText } = renderHome();
     fireEvent.press(
       await findByLabelText('Today, Rp0 spent, same as yesterday, yesterday Rp0'),
+    );
+    expect(await findByText('No expenses yet')).toBeTruthy();
+  });
+
+  it('opens week breakdown from list row', async () => {
+    const { findByLabelText, findByText } = renderHome();
+    fireEvent.press(
+      await findByLabelText('This week, Rp0 spent, same as last week, last week Rp0'),
+    );
+    expect(await findByText('No expenses yet')).toBeTruthy();
+  });
+
+  it('opens month breakdown from list row', async () => {
+    const { findByLabelText, findByText } = renderHome();
+    fireEvent.press(
+      await findByLabelText('This month, Rp0 spent, same as last month, last month Rp0'),
     );
     expect(await findByText('No expenses yet')).toBeTruthy();
   });
