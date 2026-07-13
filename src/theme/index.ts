@@ -16,10 +16,11 @@ export const colors = {
   progress: '#59CC01',
   interactive: '#163300',
   cardBorder: '#F0F0F0',
-  fab: '#2B2D43',
+  fab: '#163300',
   periodHeader: '#2B2D43',
+  periodHeaderPressed: '#23253A',
   periodHeaderText: '#FFFFFF',
-  periodHeaderMuted: 'rgba(255, 255, 255, 0.78)',
+  periodHeaderMuted: '#B8B9C8',
   periodRowPressed: 'rgba(43, 45, 67, 0.06)',
   comparisonOnDarkUp: '#FF8A80',
   comparisonOnDarkDown: '#A5D6A7',
@@ -44,6 +45,22 @@ export const spacing = {
 };
 
 export const typography = {
+  screenLabel: {
+    fontSize: 13,
+    fontWeight: '400' as const,
+    lineHeight: 18,
+  },
+  periodHero: {
+    fontSize: 32,
+    fontWeight: '600' as const,
+    lineHeight: 38,
+    fontVariant: ['tabular-nums'] as const,
+  },
+  periodMeta: {
+    fontSize: 13,
+    fontWeight: '500' as const,
+    lineHeight: 18,
+  },
   greeting: {
     fontSize: 28,
     fontWeight: '600' as const,
@@ -62,6 +79,12 @@ export const typography = {
     fontSize: 20,
     fontWeight: '600' as const,
     lineHeight: 24,
+  },
+  tabularAmount: {
+    fontSize: 20,
+    fontWeight: '600' as const,
+    lineHeight: 24,
+    fontVariant: ['tabular-nums'] as const,
   },
   comparison: {
     fontSize: 14,
@@ -127,14 +150,10 @@ export const radii = {
 export const hitSlop = { top: 8, bottom: 8, left: 8, right: 8 };
 
 export const homeLayout = {
-  cardWidth: 254,
-  cardHeight: 181,
-  cardGap: 16,
-  horizontalPadding: 15,
+  cardGap: spacing.md,
+  horizontalPadding: spacing.md,
   contentMaxWidth: 560,
-  greetingTop: 44,
-  cardsTop: 88,
-  listTop: 26,
+  screenTop: spacing.lg,
   fabSize: 50,
   avatarSize: 22,
 };

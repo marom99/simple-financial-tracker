@@ -1,11 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FloatingAddButton } from '../components/FloatingAddButton';
 import { PeriodOverviewCard } from '../components/PeriodOverviewCard';
@@ -16,9 +10,6 @@ import { buildPeriodSummary } from '../features/expenses/selectors';
 import type { PeriodSummary, PeriodType } from '../features/expenses/types';
 import { colors, homeLayout, spacing, typography } from '../theme';
 
-const DISPLAY_NAME = 'Frederic';
-const HEADER_GRADIENT = require('../../assets/home/header-gradient.png');
-
 export function HomeScreen() {
   const expenses = useExpenses();
   const insets = useSafeAreaInsets();
@@ -27,6 +18,9 @@ export function HomeScreen() {
   const monthSummary = useMemo(() => buildPeriodSummary(expenses, 'month'), [expenses]);
   const [selectedSummary, setSelectedSummary] = useState<PeriodSummary | null>(null);
   const [addVisible, setAddVisible] = useState(false);
+
+  const isEmptyOverview =
+    todaySummary.total === 0 && weekSummary.total === 0 && monthSummary.total === 0;
 
   const openBreakdown = (period: PeriodType) => {
     const summaries: Record<PeriodType, PeriodSummary> = {
@@ -46,8 +40,6 @@ export function HomeScreen() {
 
   return (
     <View style={styles.root}>
-      <Image source={HEADER_GRADIENT} style={styles.gradient} resizeMode="cover" />
-
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <ScrollView
           contentContainerStyle={[
@@ -57,7 +49,7 @@ export function HomeScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.contentFrame}>
-            <Text style={styles.greeting}>{`Hi, ${DISPLAY_NAME} ☺️`}</Text>
+            <Text style={styles.screenTitle}>Spending</Text>
 
             <View style={styles.cardsStack}>
               <PeriodOverviewCard
@@ -67,6 +59,10 @@ export function HomeScreen() {
                 week={weekSummary}
               />
             </View>
+
+            {isEmptyOverview ? (
+              <Text style={styles.emptyHint}>No expenses yet — tap + to log your first</Text>
+            ) : null}
           </View>
         </ScrollView>
 
@@ -92,14 +88,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  gradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    width: '100%',
-    height: 256,
-  },
   safeArea: {
     flex: 1,
   },
@@ -111,18 +99,24 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: homeLayout.contentMaxWidth,
     paddingHorizontal: homeLayout.horizontalPadding,
-    paddingTop: homeLayout.greetingTop,
+    paddingTop: homeLayout.screenTop,
   },
-  greeting: {
-    ...typography.greeting,
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
+  screenTitle: {
+    ...typography.screenLabel,
+    color: colors.textSecondary,
+    marginBottom: spacing.lg,
   },
   cardsStack: {
     gap: homeLayout.cardGap,
   },
+  emptyHint: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: spacing.lg,
+    textAlign: 'center',
+  },
   fabContainer: {
     position: 'absolute',
-    right: 16,
+    right: spacing.md,
   },
 });

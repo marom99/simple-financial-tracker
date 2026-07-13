@@ -16,7 +16,7 @@ describe('app foundation', () => {
         <App />
       </SafeAreaProvider>,
     );
-    expect(getByText(/Hi, Frederic/)).toBeTruthy();
+    expect(getByText('Spending')).toBeTruthy();
     expect(getByText('Today')).toBeTruthy();
     expect(getByText('This week')).toBeTruthy();
     expect(getByText('This month')).toBeTruthy();

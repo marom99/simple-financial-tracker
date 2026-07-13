@@ -1,17 +1,12 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Svg, { Path, Rect } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import { formatSpendingCardAccessibilityLabel } from '../features/expenses/comparison';
 import type { PeriodSummary, PeriodType } from '../features/expenses/types';
 import { colors, hitSlop, radii, spacing, typography } from '../theme';
 import { formatRupiah } from '../utils/currency';
-import { ComparisonIndicator } from './ComparisonIndicator';
 
-const HEADER_ICON_SIZE = 52;
-const ROW_ICON_SIZE = 22;
 const CHEVRON_SIZE = 18;
-
-type CalendarVariant = 'day' | 'week' | 'month';
 
 interface PeriodOverviewCardProps {
   today: PeriodSummary;
@@ -20,73 +15,19 @@ interface PeriodOverviewCardProps {
   onPressPeriod: (period: PeriodType) => void;
 }
 
-function CalendarIcon({
-  color,
-  size,
-  variant,
-}: {
-  color: string;
-  size: number;
-  variant: CalendarVariant;
-}) {
-  const marks =
-    variant === 'day' ? (
-      <Path
-        d="M8 14h2M12 14h2M16 14h2M8 17h2M12 17h2"
-        stroke={color}
-        strokeWidth={1.75}
-        strokeLinecap="round"
-      />
-    ) : variant === 'week' ? (
-      <Path
-        d="M7 14h10"
-        stroke={color}
-        strokeWidth={1.75}
-        strokeLinecap="round"
-      />
-    ) : (
-      <Path
-        d="M7 14h2.5M11.25 14h2.5M15.5 14H18M7 17h2.5M11.25 17h2.5M15.5 17H18"
-        stroke={color}
-        strokeWidth={1.75}
-        strokeLinecap="round"
-      />
-    );
-
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Rect
-        x={3}
-        y={5}
-        width={18}
-        height={16}
-        rx={2}
-        stroke={color}
-        strokeWidth={1.75}
-      />
-      <Path d="M3 10h18" stroke={color} strokeWidth={1.75} strokeLinecap="round" />
-      <Path
-        d="M8 3v4M16 3v4"
-        stroke={color}
-        strokeWidth={1.75}
-        strokeLinecap="round"
-      />
-      {marks}
-    </Svg>
-  );
-}
-
 function ChevronRightIcon({ color }: { color: string }) {
   return (
-    <Svg width={CHEVRON_SIZE} height={CHEVRON_SIZE} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="m9 6 6 6-6 6"
-        stroke={color}
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </Svg>
+    <View style={styles.chevron}>
+      <Svg width={CHEVRON_SIZE} height={CHEVRON_SIZE} viewBox="0 0 24 24" fill="none">
+        <Path
+          d="m9 6 6 6-6 6"
+          stroke={color}
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </Svg>
+    </View>
   );
 }
 
@@ -94,7 +35,6 @@ interface PeriodRowProps {
   title: string;
   summary: PeriodSummary;
   period: PeriodType;
-  variant: CalendarVariant;
   showDivider?: boolean;
   onPress: () => void;
 }
@@ -103,7 +43,6 @@ function PeriodRow({
   title,
   summary,
   period,
-  variant,
   showDivider = true,
   onPress,
 }: PeriodRowProps) {
@@ -120,26 +59,16 @@ function PeriodRow({
         accessibilityHint="Opens spending breakdown"
         hitSlop={hitSlop}
         onPress={onPress}
-        style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+        style={styles.row}
       >
-        <View style={styles.rowLeading}>
-          <View style={styles.rowIcon}>
-            <CalendarIcon color={colors.periodHeader} size={ROW_ICON_SIZE} variant={variant} />
-          </View>
-          <Text style={styles.rowLabel} numberOfLines={1}>
-            {title}
-          </Text>
-        </View>
+        <Text style={styles.rowLabel} numberOfLines={1}>
+          {title}
+        </Text>
         <View style={styles.rowTrailing}>
-          <Text
-            adjustsFontSizeToFit
-            minimumFontScale={0.75}
-            numberOfLines={1}
-            style={styles.rowAmount}
-          >
+          <Text numberOfLines={1} style={styles.rowAmount}>
             {formatRupiah(summary.total)}
           </Text>
-          <ChevronRightIcon color={colors.textHint} />
+          <ChevronRightIcon color={colors.textMuted} />
         </View>
       </Pressable>
       {showDivider ? <View style={styles.divider} /> : null}
@@ -168,24 +97,15 @@ export function PeriodOverviewCard({
         onPress={() => onPressPeriod('today')}
         style={({ pressed }) => [styles.header, pressed && styles.headerPressed]}
       >
-        <View style={styles.headerIconCircle}>
-          <CalendarIcon color={colors.periodHeader} size={26} variant="day" />
-        </View>
         <Text style={styles.headerTitle}>Today</Text>
-        <View style={styles.headerAmountRow}>
-          <Text
-            adjustsFontSizeToFit
-            minimumFontScale={0.72}
-            numberOfLines={1}
-            style={styles.headerAmount}
-          >
+        <View style={styles.headerBody}>
+          <Text numberOfLines={1} style={styles.headerAmount}>
             {formatRupiah(today.total)}
           </Text>
-          <ComparisonIndicator appearance="onDark" comparison={today.comparison} />
+          <Text style={styles.headerSubtitle} numberOfLines={1}>
+            {today.previousPeriodLine}
+          </Text>
         </View>
-        <Text style={styles.headerSubtitle} numberOfLines={1}>
-          {today.previousPeriodLine}
-        </Text>
       </Pressable>
 
       <View style={styles.list}>
@@ -193,14 +113,12 @@ export function PeriodOverviewCard({
           title="This week"
           summary={week}
           period="week"
-          variant="week"
           onPress={() => onPressPeriod('week')}
         />
         <PeriodRow
           title="This month"
           summary={month}
           period="month"
-          variant="month"
           showDivider={false}
           onPress={() => onPressPeriod('month')}
         />
@@ -214,6 +132,8 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     width: '100%',
     borderRadius: radii.periodCard,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     overflow: 'hidden',
   },
   header: {
@@ -221,58 +141,41 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
-    paddingBottom: spacing.md + spacing.xs,
-    gap: spacing.xs,
+    paddingBottom: spacing.md,
+    gap: spacing.sm,
   },
   headerPressed: {
-    backgroundColor: colors.periodHeader,
-    opacity: 0.94,
-  },
-  headerIconCircle: {
-    width: HEADER_ICON_SIZE,
-    height: HEADER_ICON_SIZE,
-    borderRadius: HEADER_ICON_SIZE / 2,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.xs,
+    backgroundColor: colors.periodHeaderPressed,
   },
   headerTitle: {
-    ...typography.title3,
-    fontWeight: '600',
-    color: colors.periodHeaderText,
+    ...typography.periodMeta,
+    color: colors.periodHeaderMuted,
     textAlign: 'center',
+    alignSelf: 'stretch',
   },
-  headerAmountRow: {
-    flexDirection: 'row',
+  headerBody: {
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
+    gap: spacing.xs,
     width: '100%',
-    maxWidth: '100%',
-    paddingHorizontal: spacing.xs,
   },
   headerAmount: {
-    ...typography.periodAmount,
-    fontSize: 28,
-    lineHeight: 34,
+    ...typography.periodHero,
     color: colors.periodHeaderText,
     flexShrink: 1,
     textAlign: 'center',
+    maxWidth: '100%',
   },
   headerSubtitle: {
-    ...typography.comparison,
+    ...typography.periodMeta,
+    fontWeight: '400',
     color: colors.periodHeaderMuted,
     textAlign: 'center',
     maxWidth: '100%',
   },
   list: {
     backgroundColor: colors.background,
-    borderWidth: 1,
-    borderTopWidth: 0,
-    borderColor: colors.periodHeader,
-    borderBottomLeftRadius: radii.periodCard,
-    borderBottomRightRadius: radii.periodCard,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.divider,
   },
   row: {
     flexDirection: 'row',
@@ -283,28 +186,12 @@ const styles = StyleSheet.create({
     minHeight: 56,
     gap: spacing.sm,
   },
-  rowPressed: {
-    backgroundColor: colors.periodRowPressed,
-  },
-  rowLeading: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
+  rowLabel: {
+    ...typography.periodLabel,
+    color: colors.textSecondary,
     flex: 1,
     flexShrink: 1,
     minWidth: 0,
-  },
-  rowIcon: {
-    width: 28,
-    height: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  rowLabel: {
-    ...typography.periodLabel,
-    color: colors.textPrimary,
-    flexShrink: 1,
   },
   rowTrailing: {
     flexDirection: 'row',
@@ -314,15 +201,18 @@ const styles = StyleSheet.create({
     maxWidth: '48%',
   },
   rowAmount: {
-    ...typography.periodAmount,
+    ...typography.tabularAmount,
     fontSize: 17,
     lineHeight: 22,
     color: colors.textPrimary,
     textAlign: 'right',
   },
+  chevron: {
+    marginLeft: 1,
+  },
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.divider,
-    marginLeft: spacing.md + 28 + spacing.sm,
+    marginLeft: spacing.md,
   },
 });

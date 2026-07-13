@@ -27,13 +27,13 @@ describe('HomeScreen', () => {
   });
 
   it('renders the home chrome with concise period cards', async () => {
-    const { findByText, findAllByText } = renderHome();
-    expect(await findByText(/Hi, Frederic/)).toBeTruthy();
+    const { findByText } = renderHome();
+    expect(await findByText('Spending')).toBeTruthy();
     expect(await findByText('Today')).toBeTruthy();
     expect(await findByText('This week')).toBeTruthy();
     expect(await findByText('This month')).toBeTruthy();
-    expect((await findAllByText('0%')).length).toBe(1);
     expect(await findByText('Yesterday: Rp0')).toBeTruthy();
+    expect(await findByText('No expenses yet — tap + to log your first')).toBeTruthy();
   });
 
   it('opens add expense flow from the floating button', async () => {

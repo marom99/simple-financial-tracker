@@ -162,5 +162,6 @@ const styles = StyleSheet.create({
   },
   percent: {
     ...typography.comparison,
+    fontVariant: ['tabular-nums'],
   },
 });
